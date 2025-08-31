@@ -1,5 +1,5 @@
 
-from pyrogram import Client, filters
+from pyrogram import Client, filters, enums
 from pyrogram.types import *
 from vars import *
 from Database.maindb import mdb
@@ -33,7 +33,7 @@ async def start_command(client, message):
 Please access it at your own risk.
 The material may include explicit or graphic content that is not suitable for minors.</blockquote>
 
-<a href="https://telegra.ph/Terms--Conditions-and-Privacy-Policy-07-01">Terms and Conditions</a></b>"""
+<a href="https://telegram.org/privacy">Terms and Conditions</a></b>"""
 
     keyboard = ReplyKeyboardMarkup(
         [
@@ -50,7 +50,7 @@ The material may include explicit or graphic content that is not suitable for mi
     await message.reply_text(msg,
                              reply_markup = InlineKeyboardMarkup(
                                  [
-                                  [InlineKeyboardButton("Help", callback_data="help"),InlineKeyboardButton("About", callback_data="about")],[InlineKeyboardButton("Close", callback_data="close")]]),
+                                  [InlineKeyboardButton("Help", url="https://xyz.com"),InlineKeyboardButton("About", url="https://xyz.com")],[InlineKeyboardButton("Close", callback_data="close")]]),
                                   disable_web_page_preview=True,
                                   parse_mode=ParseMode.HTML,
                                   message_effect_id=5104841245755180586)
@@ -113,7 +113,8 @@ async def send_random_video(client: Client, message: Message):
             from_chat_id=DATABASE_CHANNEL_ID,
             message_id=video_id,
             caption=caption_text if caption_text else None,
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
+            parse_mode=enums.ParseMode.MARKDOWN
         )
 
         # await mdb.increment_daily_count(user_id)
@@ -137,7 +138,7 @@ async def show_plans(client: Client, message: Message):
 
 If you wish to upgrade, simply choose your preferred plan from the options below.
 
-<a href="https://telegra.ph/Terms--Conditions-and-Privacy-Policy-07-01">Terms and Conditions</a></b>"""
+<a href="https://telegram.org/privacy">Terms and Conditions</a></b>"""
     await message.reply_text(
         PRIME_TXT,
         reply_markup=InlineKeyboardMarkup([

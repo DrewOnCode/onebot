@@ -27,6 +27,7 @@ class Bot(Client):
         self.uptime = datetime.now()
 
         self.REQFSUB = await mdb.get_request_forcesub()
+        print(self.REQFSUB)
         self.CHANNEL_LIST, self.FSUB_BUTTONS = [], []
         self.REQ_FSUB_BUTTONS = {'normal': [], 'request': {}}
         await self.update_chat_ids()

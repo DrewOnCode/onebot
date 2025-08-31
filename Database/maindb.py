@@ -415,6 +415,14 @@ class Database:
     async def get_buttons(self):
         channel = await self.msginfo.find_one({'id': '0'})
         return channel['buttons'] if channel and channel.get('buttons') else None
+    
+    async def set_request_forcesub(self, value: bool):
+        existing = await self.rqst_fsub_data.find_one({})
+        if existing:
+            await self.rqst_fsub_data.update_one({}, {'$set': {'value': value}})
+        else:
+            await self.rqst_fsub_data.insert_one({'value': value})
+
 # ==================================================================
 
 def format_remaining_time(expiry):

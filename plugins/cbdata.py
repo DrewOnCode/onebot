@@ -34,9 +34,9 @@ which provide higher limits, faster access, and better features for a smoother e
 
 Please note, this bot is strictly for adult users (18+) and you are using it at your own responsibility.
 
-<a href="https://telegra.ph/Terms--Conditions-and-Privacy-Policy-07-01">Terms and Conditions</a></b>""",
+<a href="https://telegram.org/privacy">Terms and Conditions</a></b>""",
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("About", callback_data="about")],
+                [InlineKeyboardButton("About", url="https://xyz.com")],
                 [InlineKeyboardButton("Admin", callback_data="admincmds"),
                  InlineKeyboardButton("Home", callback_data="home")]]),
             disable_web_page_preview=True,
@@ -61,10 +61,10 @@ Please note, this bot is strictly for adult users (18+) and you are using it at 
 
 <blockquote>⚠️ If you facing any error, Please Contact - <a href='https://t.me/{ADMIN_USERNAME}'>Support</a></blockquote>
 
-<a href="https://telegra.ph/Terms--Conditions-and-Privacy-Policy-07-01">Terms and Conditions</a></b>""",
+<a href="https://telegram.org/privacy">Terms and Conditions</a></b>""",
             reply_markup=InlineKeyboardMarkup([
                 [InlineKeyboardButton("Home", callback_data="home"),
-                 InlineKeyboardButton("Help", callback_data="help")]]),
+                 InlineKeyboardButton("Help", url="https://xyz.com")]]),
             disable_web_page_preview=True,
             parse_mode=ParseMode.HTML
         )
@@ -81,9 +81,9 @@ Please note, this bot is strictly for adult users (18+) and you are using it at 
 Please access it at your own risk.
 The material may include explicit or graphic content that is not suitable for minors.</blockquote>
 
-<a href="https://telegra.ph/Terms--Conditions-and-Privacy-Policy-07-01">Terms and Conditions</a></b>""", reply_markup=InlineKeyboardMarkup(
+<a href="https://telegram.org/privacy">Terms and Conditions</a></b>""", reply_markup=InlineKeyboardMarkup(
                 [[InlineKeyboardButton("Buy Subscription", callback_data="pro")],
-                 [InlineKeyboardButton("Help", callback_data="help"), InlineKeyboardButton("About", callback_data="about")], [InlineKeyboardButton("Close", callback_data="close")]]),
+                 [InlineKeyboardButton("Help", url="https://xyz.com"), InlineKeyboardButton("About", url="https://xyz.com")], [InlineKeyboardButton("Close", callback_data="close")]]),
             disable_web_page_preview=True,
             parse_mode=ParseMode.HTML)
 
@@ -99,7 +99,7 @@ The material may include explicit or graphic content that is not suitable for mi
 
 If you wish to upgrade, simply choose your preferred plan from the options below.
 
-<a href="https://telegra.ph/Terms--Conditions-and-Privacy-Policy-07-01">Terms and Conditions</a></b>"""
+<a href="https://telegram.org/privacy">Terms and Conditions</a></b>"""
         await q.edit_message_text(
             PRIME_TXT,
             reply_markup=InlineKeyboardMarkup([
@@ -297,3 +297,34 @@ If you wish to upgrade, simply choose your preferred plan from the options below
     elif query == "remove_buttons":
         await db.set_buttons(None)
         await callback_query.answer('Buttons removed successfully ✅', show_alert=True)
+    
+    elif data == 'chng_req':
+        
+            try:
+                on = off = ""
+                if client.REQFSUB:
+                    await mdb.set_request_forcesub(False)
+                    client.REQFSUB = False
+                    off = "🔴"
+                    texting = "Disabled ❌"
+                else:
+                    await mdb.set_request_forcesub(True)
+                    client.REQFSUB = True
+                    on = "🟢"
+                    texting = "Enabled ✅"
+        
+                button = [
+                    [InlineKeyboardButton(f"{on} ON", "chng_req"), InlineKeyboardButton(f"{off} OFF", "chng_req")],
+                    [InlineKeyboardButton("Close", "close")]
+                ]
+                await callback_query.message.edit_text(text=RFSUB_CMD_TXT.format(req_mode=texting), reply_markup=InlineKeyboardMarkup(button)) #🎉)
+            except Exception as e:
+                print(f"! Error Occured on callback data = 'chng_req' : {e}")
+
+
+RFSUB_CMD_TXT = """**⚙️ Force Sub Settings**
+
+ForceSub is currently: {req_mode}
+
+Use the buttons below to enable or disable ForceSub.
+"""
