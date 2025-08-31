@@ -90,9 +90,9 @@ async def send_random_video(client: Client, message: Message):
     daily_count = user.get("daily_count", 0)
     daily_limit = user.get("daily_limit", FREE_LIMIT)
 
-    # if daily_count > daily_limit:
-    #     await message.reply_text(f"**🚫 You've reached your daily limit of {daily_limit} videos.\n\n>Limit will reset every day at 5 AM (IST).**")
-    #     return
+    if daily_count > daily_limit:
+        await message.reply_text(f"**🚫 You've reached your daily limit of {daily_limit} videos.\n\n>Limit will reset every day at 5 AM (IST).**")
+        return
 
     try:
         caption_text = await mdb.get_caption()
