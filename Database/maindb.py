@@ -416,6 +416,17 @@ class Database:
         channel = await self.msginfo.find_one({'id': '0'})
         return channel['buttons'] if channel and channel.get('buttons') else None
     
+    async def set_admin_state(self, user_id, state):
+        await self.async_user_collection.update_one(
+            {'_id': user_id},
+            {'$set': {'admin_state': state}},
+            upsert=True
+        )
+
+    async def get_admin_state(self, user_id):
+        user = await self.async_user_collection.find_one({'_id': user_id})
+        return user.get('admin_state') if user else None
+
     async def set_request_forcesub(self, value: bool):
         existing = await self.rqst_fsub_data.find_one({})
         if existing:
