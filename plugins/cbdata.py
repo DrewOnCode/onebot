@@ -1,4 +1,3 @@
-
 from pyrogram import Client, filters
 from pyrogram.types import *
 from datetime import datetime
@@ -9,6 +8,44 @@ from pyrogram.enums import ParseMode
 db = mdb
 from plugins.string_to_buttons import string_to_buttons
 import asyncio
+from pyrogram.errors import ButtonUrlInvalid
+
+
+@Client.on_message(filters.private & filters.user(ADMIN_ID))
+async def admin_message_handler(bot: Client, message: Message):
+    admin_state = await mdb.get_admin_state(message.from_user.id)
+
+    if admin_state == "add_caption":
+        if message.text.lower() == '/cancel':
+            await mdb.set_admin_state(message.from_user.id, None)
+            await message.reply('Cancelled', quote=True)
+            return
+
+        await mdb.set_caption(message.text.markdown)
+        await mdb.set_admin_state(message.from_user.id, None)
+        await message.reply('Caption set successfully ✅', quote=True)
+
+    elif admin_state == "add_buttons":
+        if message.text.lower() == '/cancel':
+            await mdb.set_admin_state(message.from_user.id, None)
+            await message.reply('Cancelled', quote=True)
+            return
+        
+        if "-" not in message.text:
+            await message.reply('Wrong format! Try again.', quote=True)
+            return
+
+        try:
+            given_buttons = await string_to_buttons(message.text)
+            await message.reply('Preview:', reply_markup=InlineKeyboardMarkup(given_buttons))
+            await mdb.set_buttons(message.text)
+            await mdb.set_admin_state(message.from_user.id, None)
+            await message.reply('Buttons set successfully ✅', quote=True)
+        except ButtonUrlInvalid:
+            await message.reply('Invalid URL format! Try again.', quote=True)
+        except Exception as e:
+            await message.reply(f"An error occurred: {e}", quote=True)
+
 
 @Client.on_callback_query()
 async def cb_handler(client, q: CallbackQuery):
@@ -247,48 +284,20 @@ If you wish to upgrade, simply choose your preferred plan from the options below
             )
 
     elif query == "add_caption":
-        try:
-            data = await client.ask(
-                user_id,
-                'Please send the new caption or /cancel to stop. Anything you send now will be set as caption.',
-                timeout=300
-            )
-            if data.text.lower() == '/cancel':
-                await data.reply('Cancelled', quote=True)
-            else:
-                await db.set_caption(data.text.markdown)
-                await data.reply('Caption set successfully ✅', quote=True)
-        except asyncio.exceptions.TimeoutError:
-            await callback_query.answer("Timeout. Try again!", show_alert=True)
+        await db.set_admin_state(user_id, "add_caption")
+        await callback_query.message.reply_text(
+            'Please send the new caption or /cancel to stop. Anything you send now will be set as caption.'
+        )
 
     elif query == "add_buttons":
-        try:
-            data = await client.ask(
-                user_id,
-                "**Buttons Format:**\n\n"
-                "Format: `Text - link`\n\n"
-                "For multiple buttons in same row use `|`\n"
-                "For multiple rows, use new lines.\n\n"
-                "Send buttons or /cancel to stop.",
-                timeout=300
-            )
-            while True:
-                if data.text == '/cancel':
-                    await data.reply('Cancelled', quote=True)
-                    break
-                if "-" not in data.text:
-                    data = await client.ask(user_id, 'Wrong format! Try again.', timeout=300)
-                else:
-                    given_buttons = await string_to_buttons(data.text)
-                    try:
-                        await data.reply('Preview:', reply_markup=InlineKeyboardMarkup(given_buttons))
-                        await db.set_buttons(data.text)
-                        await data.reply('Buttons set successfully ✅', quote=True)
-                        break
-                    except ButtonUrlInvalid:
-                        data = await client.ask(user_id, 'Invalid URL format! Try again.', timeout=300)
-        except asyncio.exceptions.TimeoutError:
-            await callback_query.answer("Timeout. Try again!", show_alert=True)
+        await db.set_admin_state(user_id, "add_buttons")
+        await callback_query.message.reply_text(
+            "**Buttons Format:**\n\n"
+            "Format: `Text - link`\n\n"
+            "For multiple buttons in same row use `|`\n"
+            "For multiple rows, use new lines.\n\n"
+            "Send buttons or /cancel to stop."
+        )
 
     elif query == "remove_caption":
         await db.set_caption(None)
