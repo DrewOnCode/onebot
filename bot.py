@@ -45,10 +45,9 @@ class Bot(Client):
 
         except Exception as e:
             print(f"Error: {e}")
-            print(f"Make sure the bot is Admin in DB Channel and has proper permissions. Double check the DATABASE_CHANNEL_ID value. Current Value: {CHANNEL_ID}")
+            print(f"Make sure the bot is Admin in DB Channel and has proper permissions. Double check the DATABASE_CHANNEL_ID value. Current Value")
             print("Bot stopped..")
-            sys.exit()
-
+            
         self.set_parse_mode(ParseMode.HTML)
         print("Bot Started")
         print(f"{self.name} is running!")
